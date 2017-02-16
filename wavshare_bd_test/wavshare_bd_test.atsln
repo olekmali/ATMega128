@@ -1,0 +1,20 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Atmel Studio Solution File, Format Version 11.00
+Project("{54F91283-7BC4-4236-8FF9-10F437C3AD48}") = "wavshare_bd_test", "wavshare_bd_test\wavshare_bd_test.cproj", "{47F80962-A856-43DF-8D80-EA5C2F5145AF}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|AVR = Debug|AVR
+		Release|AVR = Release|AVR
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{47F80962-A856-43DF-8D80-EA5C2F5145AF}.Debug|AVR.ActiveCfg = Debug|AVR
+		{47F80962-A856-43DF-8D80-EA5C2F5145AF}.Debug|AVR.Build.0 = Debug|AVR
+		{47F80962-A856-43DF-8D80-EA5C2F5145AF}.Release|AVR.ActiveCfg = Release|AVR
+		{47F80962-A856-43DF-8D80-EA5C2F5145AF}.Release|AVR.Build.0 = Release|AVR
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
