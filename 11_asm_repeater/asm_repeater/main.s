@@ -42,7 +42,7 @@ main:
 loop:
     in      R16,                        _SFR_IO_ADDR(PINE)
     andi    R16,                        0b00010000
-    eor     R26,                        R17
+    eor     R16,                        R17
     lsr     R16
     lsr     R16
     lsr     R16

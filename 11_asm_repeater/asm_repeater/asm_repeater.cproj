@@ -12,9 +12,9 @@
     <OutputFileName>$(MSBuildProjectName)</OutputFileName>
     <OutputFileExtension>.elf</OutputFileExtension>
     <OutputDirectory>$(MSBuildProjectDirectory)\$(Configuration)</OutputDirectory>
-    <AssemblyName>one_file_asm</AssemblyName>
-    <Name>one_file_asm</Name>
-    <RootNamespace>one_file_asm</RootNamespace>
+    <AssemblyName>asm_repeater</AssemblyName>
+    <Name>asm_repeater</Name>
+    <RootNamespace>asm_repeater</RootNamespace>
     <ToolchainFlavour>Native</ToolchainFlavour>
     <KeepTimersRunning>true</KeepTimersRunning>
     <OverrideVtor>false</OverrideVtor>
