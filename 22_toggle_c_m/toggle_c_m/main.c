@@ -24,12 +24,12 @@ int main(void)
 {
     // constant data
     // Note: expressions (1<<const) are known at the compilation time and are replaced by resulting constant values - no code!
-    /* static */ const uint8_t map_keys[4] = { 1<<B0, 1<<B1, 1<<B2, 1<<B3 }; 
-    /* static */ const uint8_t map_leds[4] = { 1<<L0, 1<<L1, 1<<L2, 1<<L3 };
+    /* static */ const uint8_t map_keys[map_size] = { 1<<B0, 1<<B1, 1<<B2, 1<<B3 }; 
+    /* static */ const uint8_t map_leds[map_size] = { 1<<L0, 1<<L1, 1<<L2, 1<<L3 };
     
     // variables
     uint8_t buttons_current, buttons_old;
-    uint8_t led_current = 0x80;  // LED are off except for the #7
+    uint8_t led_current = 1<<ALIVE1;  // LED are off except for the #7
     
     // initialization code
     init_digital_io();
