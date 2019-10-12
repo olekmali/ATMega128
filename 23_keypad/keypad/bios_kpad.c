@@ -6,12 +6,14 @@
 
 inline void delay_digital_io_change(void)
 {
-    // Note: asm("nop"); - this would work too but is not ANSI C90 or C99 standard
+    // Note: asm("nop"); - this would work too but that is not ANSI C90 or C99 standard notation
     __asm__ __volatile__("nop");
     __asm__ __volatile__("nop");
     __asm__ __volatile__("nop");
     // Possible test question: what is inline modifier doing?
     // Possible test question: does inline work both in Debug and Release compiler mode?
+    // Possible test question: what is volatile modifier doing?
+    // Possible test question: does volatile work both in Debug and Release compiler mode?
 }
 
 
@@ -19,35 +21,40 @@ uint16_t scan_keypad()
 {
     uint16_t status = KEYPAD_NONE;
 
-    // Scanning will happen by activating only one bit as output with 0/LOW 
-    // and keeping all remaining bits as high impedance with pull up resistors
-    // Both H and I denote the same digital IO pin configuration 
-
-    // but philosophically 'I' is used as input with pull up that we are going to read back
-    //                 and 'H' merely as high impedance with pull up and we do not care to read it back
     // The scanning sequence is as follows:
-    // HHH0IIII - read - HHH1IIII (with pull up resistors active)
-    // HH0HIIII - read - HH1HIIII (with pull up resistors active)
-    // H0HHIIII - read - H1HHIIII (with pull up resistors active)
-    // 0HHHIIII - read - 1HHHIIII (with pull up resistors active)
+    //   DDRC     &    PORTC
+    // 1111 1111  &  1111 1111 -- initial charge of parasitic Cs
+    // then wait for a very short time
+    // 0001 0000  &  1110 1111 -- scan the bottom row
+    // then wait 3+ clock cycles and read PINC & 0x0F
+    // 0010 0000  &  1101 1111 -- scan the 2nd row
+    // then wait 3+ clock cycles and read PINC & 0x0F
+    // 0100 0000  &  1011 1111 -- scan the 3rd row
+    // then wait 3+ clock cycles and read PINC & 0x0F
+    // 1000 0000  &  0111 1111 -- scan the top row
+    // then wait 3+ clock cycles and read PINC & 0x0F
+    // 0000 0000  &  0000 0000 -- disconnect for PIN safety
+ // or 1111 0000  &  1111 0000 -- for PIN change interrupt driven keypad
 
-    PORTC = 0xFF;                   // all resistors up or output high before the first scan
+    DDRC  = 0xFF;                   // make all pins as output pins for a short time before the first scan 
+    PORTC = 0xFF;                   // set all pins to high voltage to charge all parasitic capacitance
     // delay_digital_io_change();
 
-    uint8_t  swip_bit = 0x10;	    // perhaps this variable could be useful to you?
+    uint8_t  swip_bit = 0b00010000; // perhaps this variable could be useful to you?
     for(uint8_t i=0; i<4; i++)
     {
         DDRC  = swip_bit;           // set input/output direction for this row reading
-        PORTC = ~swip_bit | 0x0F;   // set the active low line with all others high or with pull up resistors
+        PORTC = ~swip_bit;          // set the active low line with all others high or with pull up resistors
         delay_digital_io_change();
-        status = (status<<4) | (0x0F & ~PINC );
-        PORTC = 0xFF;               // set the active high line to quickly recharge the parasite capacitance
+        status = (status<<4) | (0x0F & ~PINC ); // read and accumulate the 4 input bits of columns
+        PORTC = 0xFF;               // set the active line to 1 to quickly recharge the parasitic capacitance
         // delay_digital_io_change();
         swip_bit = swip_bit<<1;     // perhaps this variable could be useful to you?
     }
 
-    DDRC  = 0; // shut down output for safety (no high current in case of pin shorting)
-    PORTC = 0; // shut down pull ups (potentially for energy conservation)
+    DDRC  = 0;                      // shut down output for safety (no high current in case of pin shorting)
+    PORTC = 0;                      // shut down pull ups (potentially for energy conservation)
+    // note: these two lines should be set up differently for lowering edge interrupt mode in Junior Lab
 
     return(status);
 }
