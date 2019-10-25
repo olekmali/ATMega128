@@ -28,7 +28,7 @@ void Timer1_initialize ( uint32_t frequency, void (*handle_overflow)(void), uint
     // where PPP of 011 is clock rescale of 64
     // where MM MM is the Timer mode, we use 01 00 - CTC
     
-    TIFR  &= ~(1<<ICF1|1<<OCF1A|OCF1B|TOV1);
+    TIFR  &= ~(1<<ICF1|1<<OCF1A|1<<OCF1B|1<<TOV1);
     // reset any pending Timer1 interrupts 
     // (note: entirely redundant as none is pending - it was never used before)
     
@@ -47,7 +47,7 @@ void Timer1_shutdown ()
     TCCR1A = 0;
     TCCR1B = 0;
     TCCR1C = 0;
-    TIFR   = TIFR & ~(1<<ICF1|1<<OCF1A|OCF1B|TOV1);
+    TIFR   = TIFR & ~(1<<ICF1|1<<OCF1A|1<<OCF1B|1<<TOV1);
     TIMSK  = TIMSK & ~(1<<TICIE1|1<<OCIE1B|1<<OCIE1A|1<<TOIE1);
 }
 
