@@ -26,34 +26,18 @@ void PWM_generator_setCoef(uint8_t channel, uint8_t percentage)
 {
     uint8_t sreg_save = SREG;           // Preserve Current Interrupt Status
     cli();
-    
+
     if ( PWM_100_PERCENT < percentage)
         percentage = PWM_100_PERCENT;
-    
+
     if ( PWM_CH_MAX>channel )
     {
-        MyPWMCoef_reload[channel] = percentage * (uint32_t)PHASE_PREC / PWM_100_PERCENT;
+        MyPWMCoef_reload[channel] = ( (uint32_t)percentage * (uint32_t)PHASE_PREC ) / PWM_100_PERCENT;
         MyPWMCoef_change = 1;
         // Note: Actual change in PWM will take effect when a new PWM cycle starts to prevent glitches
-    }        
-        
-    SREG = sreg_save;                   // restore interrupts
-}
+    }
 
-
-uint8_t PWM_generator_getCoef(uint8_t channel)
-{
-    uint8_t value;
-    uint8_t sreg_save = SREG;           // Preserve Current Interrupt Status
-    cli();
-    
-    if ( PWM_CH_MAX>channel )
-        value = (uint8_t) ( MyPWMCoef_reload[channel] * (uint32_t)PWM_100_PERCENT / PHASE_PREC );
-    else
-        value = 0;
-    
     SREG = sreg_save;                   // restore interrupts
-    return(value);
 }
 
 
@@ -61,11 +45,11 @@ void PWM_generator_setFreq(uint32_t int_frq, uint16_t pwm_frq)
 {
     uint8_t sreg_save = SREG;           // Preserve Current Interrupt Status
     cli();
-    
-    MyPWMFreq_reload = pwm_frq * (uint32_t)PHASE_PREC / int_frq;
+
+    MyPWMFreq_reload = ( (uint32_t)pwm_frq * (uint32_t)PHASE_PREC ) / int_frq;
     MyPWMCoef_change = 1;
     // Note: Actual change in PWM will take effect when a new PWM cycle starts to prevent glitches
-        
+
     SREG = sreg_save;                   // restore interrupts
 }
 
@@ -90,28 +74,30 @@ void MyPWM_generator_copyParam(void)
 void PWM_generator_interrupt (void)
 {
     // static variable - a global variable hidden in a function
-    static uint16_t phase_current  = 0;    // holds phase accumulator, Note: will roll over at 65536
-    static uint16_t phase_last;                     // used to detect phase roll over through 0
+    static uint16_t phase_current  = 0;     // holds phase accumulator, Note: will roll over at 65536
+    static uint16_t phase_last;             // used to detect phase roll over through 0
 
     phase_last     = phase_current;
-    phase_current += MyPWMFreq_params;              // increment phase accumulator
+    phase_current += MyPWMFreq_params;      // increment phase accumulator
 
-    if ( MyPWMCoef_change /* && (phase_current<phase_last) */ )
+    if ( MyPWMCoef_change /* && (phase_current<phase_last)*/ )
     {
+        // Note: rollover detected when (phase_current<phase_last)
         MyPWM_generator_copyParam();
     }
-    
+
     // PWM output computation based on software counter
     uint8_t pwmbyte = led8_get() & ~PWM_CH_MASK;
 
-    uint8_t current = 0x01;
+    uint8_t curLED = 0b00000001;
     for (uint8_t i=0; i<PWM_CH_MAX; ++i)
     {
-        if ( phase_current < MyPWMCoef_params[i] ) pwmbyte |= current;
-        // else do not set that bit as ON
+        if ( phase_current < MyPWMCoef_params[i] ) {
+            pwmbyte |= curLED;
+        } // else do not set that bit as ON
 
-        current <<= 1;
+        curLED <<= 1; // curLED = curLED << 1;
     }
-    
+
     led8_set(pwmbyte);
 }

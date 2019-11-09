@@ -1,4 +1,4 @@
-//* USART1 library - header file - 2014 *
+//* USART1 library - header file - 2019 *
 #ifndef BIOS_UART1_H_
 #define BIOS_UART1_H_
 #include <stddef.h>     // needed for size_t

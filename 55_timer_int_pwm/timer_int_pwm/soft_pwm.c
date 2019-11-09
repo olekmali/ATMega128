@@ -38,22 +38,6 @@ void PWM_generator_setParam(uint8_t channel, pwm_cnt_t percentage)
 }
 
 
-pwm_cnt_t PWM_generator_getParam(uint8_t channel)
-{
-    uint8_t value;
-    uint8_t sreg_save = SREG;           // Preserve Current Interrupt Status
-    cli();
-    
-    if ( PWM_CH_MAX>channel )
-        value = MyPWMCoef_reload[channel];
-    else
-        value = 0;
-    
-    SREG = sreg_save;                   // restore interrupts
-    return(value);
-}
-
-
 //------------------------------------------------------------------------------------
 // Internal Functions
 //------------------------------------------------------------------------------------

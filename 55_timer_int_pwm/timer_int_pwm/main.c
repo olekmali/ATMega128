@@ -1,4 +1,4 @@
-//* testing TIMER1 interrupt - main.c *
+//* testing TIMER1 interrupt with software generated PWM - main.c *
 #include "bios_timer_int.h"
 #include <stdint.h>
 #include <avr/interrupt.h>
@@ -7,21 +7,11 @@
 #include "bios_led8.h"
 #include "bios_key4.h"
 
-#define PWM_FREQUENCY       (1000L)
+#define PWM_FREQUENCY       1000L
 #define INT_FREQUENCY       (PWM_FREQUENCY * PWM_RESOLUTION)
-#define KEY_SCAN_FREQUENCY  (50)
+#define MAIN_LOOP_FREQUENCY 100
 
-void ButtonMenuController(void)
-{
-    /*
-        This is the place to implement functionality of key-based menu like one in the Timer1 
-        interrupt example that demonstrates button polling with short, long and double-click 
-        button detection. Such function can access and alter PWM setting for each channel.
-        One button can be used to walk among the channels round robin style, while two other
-        buttons can be used to increase or decrease the PWM parameter for the current channel.
-    */
-}
-
+static volatile uint8_t     semaphore = 0;  // volatile keyword is very important here!
 
 //------------------------------------------------------------------------------------
 // Timer1 Interrupt Functionality
@@ -34,13 +24,15 @@ void MyTimerFN (void)
     //              - no interrupt enabling
     PWM_generator_interrupt();
 
-    static uint16_t counter = 0;            // make sure that ( SAMPLING__FRQ / 100 ) fits the variable range!
+    static uint16_t counter = 0;
+    //     ^^^^^^^^ make sure that ( SAMPLING__FRQ / MAIN_LOOP_FREQUENCY )
+    // fits the variable range! uint8_t - 255, uint16_t - 65535
     if (0<counter) counter--;
     else
     {
-        counter = ( INT_FREQUENCY / KEY_SCAN_FREQUENCY );
+        counter = ( INT_FREQUENCY / MAIN_LOOP_FREQUENCY );
 
-        ButtonMenuController();             // this must be called with the desired button scanning rate
+        semaphore = 1;
     }
 }
 
@@ -51,21 +43,57 @@ int main(void)
     led8_set(0);
     key4_init();
 
-    Timer1_initialize( INT_FREQUENCY , MyTimerFN, timer_prescale_1 );   
+    Timer1_initialize( INT_FREQUENCY , MyTimerFN, timer_prescale_1 );
+
+    // Set the PWM rates for the PWM channels
+    // Note: the functions will compute the numbers to count based on percentages here
+    uint8_t pwm0 = 0, pwm1 = 100;
+    PWM_generator_setParam (0, pwm0);
+    PWM_generator_setParam (1, pwm1);
 
     sei();
 
-    PWM_generator_setParam (0, 1);
-    PWM_generator_setParam (1, 2);
-    PWM_generator_setParam (2, 10);
-    PWM_generator_setParam (3, 20);
-    PWM_generator_setParam (4, 50);
-    PWM_generator_setParam (5, 100);
-    
+    uint8_t but_prev = 0;
     while(1) {
+        // wait for the signal to proceed from the interrupt
+        while ( semaphore==0 )
+            ;
+        // and immediately reset that signal to wait state
+        semaphore = 0;
+
+        uint8_t but_cur = key4_get();
+        uint8_t but_chg = ( but_cur^but_prev ) & but_cur;
+        but_prev = but_cur; // important! update what is now current will be past next time
+
+        // cycle through five PWM levels with one button
+        if ( (but_chg & B_K4) !=0 ) { // if ( (but_chg & 0b00000001) !=0 )
+            if (pwm0<100) {
+                pwm0 = pwm0 + 20;
+            } else {
+                pwm0 = 0;
+            }
+            PWM_generator_setParam (0, pwm0);
+        }
+
+        if ( (but_chg & B_K6) !=0 ) { // if ( (but_chg & 0b00000100) !=0 )
+            if (pwm1<80) {
+                pwm1 = pwm1 + 20;
+            } else {
+                pwm1 = 100;
+            }
+            PWM_generator_setParam (1, pwm1);
+        }
+        if ( (but_chg & B_K7) !=0 ) { // if ( (but_chg & 0b00001000) !=0 )
+            if (pwm1>20) {
+                pwm1 = pwm1 - 20;
+            } else {
+                pwm1 = 0;
+            }
+            PWM_generator_setParam (1, pwm1);
+        }
+
+
     }
 
     return(0);
 }
-
-
