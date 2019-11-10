@@ -12,7 +12,7 @@
 void chomp(char* s)
 {   // truncate the trailing end line character(s) if any
     while (*s!='\0' && *s!='\r' && *s!='\n') ++s;
-    *s = '\0';    
+    *s = '\0';
 }
 
 
@@ -27,7 +27,7 @@ int main(void)
 
         fputs("What is your name please? ", stdout);
         fgets(buffer, sizeof(buffer), stdin);
-        chomp(buffer); 
+        chomp(buffer);
         fprintf(stdout, "Hello %s!\r\nI hope that you are enjoying micro controllers\n", buffer);
         fprintf(com1, "Testing com1 stream...\n");
     }

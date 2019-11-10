@@ -15,19 +15,19 @@ int	avr_getchar(FILE *stream)
 {
     static uint8_t newline = 0;
     // ^^^ static menas that the variable is actually global but it is visible only inside the current block {}
-    // This variable is initialized ONLY ONCE to 0 and then it holds itsvalue between the function is called
+    // This variable is initialized ONLY ONCE to 0 and then it holds its value between the function is called
 
     if ( !newline )
     {
         char c = uart1_getc();
         if ('\r'== c ) newline = 1;
         uart1_putc(c);              // echo for user interaction
-        return( (uint8_t)(c) );     // typecast to unsigned to ensure result >0        
+        return( (uint8_t)(c) );     // typecast to unsigned to ensure result >0
     } else {
         char c = '\n';
         newline = 0;
         uart1_putc(c);              // echo for user interaction
-        return( (uint8_t)(c) );     // typecast to unsigned to ensure result >0        
+        return( (uint8_t)(c) );     // typecast to unsigned to ensure result >0
     }
 
 }
@@ -54,7 +54,7 @@ void std_streams_initialize()
     Many small micro controller compilers have simplified STDIO library
     Those compilers require that you only define two functions to get
     gets, puts, scanf and printf working. They would not support files
-    
+
     void putchar(char c);  _or_  char putchar(char c);
     int  getchar();
 

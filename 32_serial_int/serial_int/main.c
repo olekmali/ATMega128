@@ -9,7 +9,10 @@ void MyCharReceivedFN (char c)
 {
     // This function is called from within an interrupt
     // It must execute quickly - no loops or delays
-    led8_set( ( led8_get()&0x80 )  |  ( c & 0x7F ) );
+
+    // indicate that an interrupt is called by displaying the 7-bit char number
+    // the 8th bit is preserved for toggling in main
+    led8_set( ( led8_get()&0b10000000 )  |  ( c & 0b01111111 ) );
 
     if ( uart1_ready_TX() ) uart1_putc(c); // echo only if that would not stall
 }
@@ -27,12 +30,12 @@ int main(void)
     while (1)
     {
         cli();
-        led8_set( led8_get()^0x80 ); 
         // This reads and writes the same resource that is used inside the interrupt
         // The interrupt must not suspend this sequence of operations and modify the resource mean while
         // or data integrity will be lost in such rare but possible case
+        led8_set( led8_get()^0b10000000 );  // indicate that the main loop is "still alive"
         sei();
-        
+
         delay(500);
     }
     return(0);

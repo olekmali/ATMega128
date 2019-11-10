@@ -16,9 +16,9 @@ void uart1_initialize( uint16_t baud, void (*handle_rx)(char) )
     UART1_RX_ISR_function = handle_rx;
 
     // Set frame format: 8data, 2stop bit
-    UCSR1C = (1<<USBS)|(3<<UCSZ0);
+    UCSR1C = (1<<USBS1)|(3<<UCSZ10);
 
-    UCSR1B = (1<<RXEN)|(1<<TXEN) |(1<<RXCIE);
+    UCSR1B = (1<<RXEN1)|(1<<TXEN1) |(1<<RXCIE1);
                             //   ^^^^^^^^^^^ data received interrupt enabled (when global interrupts are enabled)
 }
 
@@ -30,13 +30,13 @@ void uart1_shutdown ()
 
 uint8_t uart1_ready_TX ()
 {
-    return ( 0 != (UCSR1A & 1<<UDRE) );
+    return ( 0 != (UCSR1A & 1<<UDRE1) );
 }
 
 void uart1_putc (char c)
 {
-    while( 0 == (UCSR1A & 1<<UDRE) ) ;
-    UDR1 = c;    
+    while( 0 == (UCSR1A & 1<<UDRE1) ) ;
+    UDR1 = c;
 }
 
 void uart1_puts (const char* const s)
@@ -48,5 +48,5 @@ void uart1_puts (const char* const s)
 ISR(USART1_RX_vect)
 {
     char value = UDR1;                   // read UART register into value
-    UART1_RX_ISR_function(value);      // call the _SHORT_ user defined function to handle it        
+    UART1_RX_ISR_function(value);      // call the _SHORT_ user defined function to handle it
 }

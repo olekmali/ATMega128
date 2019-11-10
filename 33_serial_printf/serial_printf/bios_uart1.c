@@ -12,10 +12,10 @@ void uart1_initialize(uint16_t baud)
     UBRR1L = (temp & 0xFF);
 
     // enable both sending and receiving
-    UCSR1B = (1<<RXEN)|(1<<TXEN);
+    UCSR1B = (1<<RXEN1)|(1<<TXEN1);
 
     // Set frame format: 8 data bits, 2 stop bits, no parity
-    UCSR1C = (3<<UCSZ0)|(1<<USBS);
+    UCSR1C = (3<<UCSZ10)|(1<<USBS1);
 }
 
 void uart1_initialize3 (uint16_t baud, uint8_t uart_stop_mode, uint8_t uart_parity_mode)
@@ -26,10 +26,10 @@ void uart1_initialize3 (uint16_t baud, uint8_t uart_stop_mode, uint8_t uart_pari
     UBRR1L = (temp & 0xFF);
 
     // enable both sending and receiving
-    UCSR1B = (1<<RXEN)|(1<<TXEN);
+    UCSR1B = (1<<RXEN1)|(1<<TXEN1);
 
     // Set frame format: 8 data bits, uart_stop_mode stop bit, uart_parity_mode parity type
-    UCSR1C = (3<<UCSZ0)|(1<<USBS);  // To be replaced by the line below
+    UCSR1C = (3<<UCSZ10)|(1<<USBS1);  // To be replaced by the line below
     // UCSR1C =  (3<<UCSZ0) | ( (uart_stop_mode & 0x01) << ___ ) | ( (uart_parity_mode & 0x03) << ___ ); // to be added
 }
 
@@ -42,13 +42,13 @@ void uart1_shutdown ()
 
 uint8_t uart1_ready_TX ()
 {
-    return ( 0 != (UCSR1A & 1<<UDRE) );
+    return ( 0 != (UCSR1A & 1<<UDRE1) );
 }
 
 void uart1_putc (char c)
 {
-    while( 0 == (UCSR1A & 1<<UDRE) ) ;
-    UDR1 = c;    
+    while( 0 == (UCSR1A & 1<<UDRE1) ) ;
+    UDR1 = c;
 }
 
 void uart1_puts (const char* const s)
@@ -59,12 +59,12 @@ void uart1_puts (const char* const s)
 
 uint8_t uart1_ready_RX ()
 {
-    return ( 0 != (UCSR1A & 1<<RXC) );
+    return ( 0 != (UCSR1A & 1<<RXC1) );
 }
 
 char uart1_getc ()
 {
-    while( 0 == (UCSR1A & 1<<RXC) ) ;
+    while( 0 == (UCSR1A & 1<<RXC1) ) ;
     return ( (uint8_t) UDR1 );
 }
 
@@ -72,13 +72,13 @@ char uart1_getc_echo ()
 {
    char c = uart1_getc();
    uart1_putc(c); // this is console echo for a live user
-   return c;    
+   return c;
 }
 
 uint8_t uart1_check_error()
 {
     // checks for Frame Error, Data OverRun, and Parity Error - 0b000eee0
-    return( UCSR1A & ((1<<FE)|(1<<DOR)|(1<<UPE)));
+    return( UCSR1A & ((1<<FE1)|(1<<DOR1)|(1<<UPE1)));
 }
 
 size_t uart1_gets_echo (char* s, size_t size)
@@ -95,7 +95,7 @@ size_t uart1_gets_echo (char* s, size_t size)
             uart1_putc('\r');
             uart1_putc('\n');
             *s=0;
-            break;            
+            break;
         } else {
             if (count<size) {
                 *s++=c; // *s=c; ++s;
@@ -103,7 +103,7 @@ size_t uart1_gets_echo (char* s, size_t size)
                 uart1_putc(c);
             } else {
                 uart1_putc('\a');
-            }            
+            }
         }
     }
     return(count);
@@ -172,7 +172,7 @@ size_t uart1_write (const void* const s, size_t size)
     size_t i=0;
     while ( i<size )
     {
-        uart1_putc(*p);    
+        uart1_putc(*p);
         ++p;
         ++i;
     }

@@ -5,34 +5,14 @@
 #include <avr/io.h>
 
 
-int main(void)
-{
-    char c='A';
-    led8_init();
-    uart1_initialize(uart_bps_9600);
-    while (1)
-    {
-        if ( uart1_ready_TX() ) // replace the condition with true and compare
-        {
-            led8_set(0xFF);
-            uart1_putc(c);
-            if (c<'Z') ++c; else c='A';
-            led8_set(0x00);
-        }
-    }
-    return(0);
-}
-
-
-
-/*
-
 int main_test1_putc_connection(void)
 {
     uart1_initialize(uart_bps_9600);
     while (1)
     {
         uart1_putc('A');
+        delay(1000);    // remove the delay to check what is the transmission speed
+                        // limited only bu the UART transmission speed
     }
     return(0);
 }
@@ -182,4 +162,7 @@ int main_test11(void)
 
 
 
-*/
+int main(void)
+{
+    return( main_test1_putc_connection() );
+}
