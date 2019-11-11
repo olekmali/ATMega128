@@ -1,4 +1,4 @@
-//* testing TIMER1 interrupt - main.c *
+//* Introductory examples for TIMER1 interrupt - main.c *
 #include "bios_timer_int.h"
 #include "bios_led8.h"
 #include "bios_key4.h"
@@ -26,12 +26,12 @@ void MyTimerFN (void)
     if ( 9==extended_counter )
     {
         led8_set( led8_get() | (1<<LED_OUT) );
-    }        
+    }
 
     if ( 10==extended_counter )
     {
         led8_set( led8_get() & ~(1<<LED_OUT) );
-        extended_counter = 0;      
+        extended_counter = 0;
     }
 }
 
@@ -54,7 +54,7 @@ int main1(void)
         cli();
         led8_set( led8_get() ^ (1<<LED_MAIN) );
         sei();
-    }    
+    }
 
     return(0);
 }
@@ -132,7 +132,7 @@ int main4(void)
         uint8_t new_state = key4_get() & (1<<KEY_MODE);
         if ( state != new_state && state /* !=0 */ )
         {
-            // cli(); // Exam qestion: what eventually goes wrong in this case 
+            // cli(); // Exam qestion: what eventually goes wrong in this case
                       //               and why it is more rare than in case of main2()?
             led8_set( led8_get() ^ (1<<LED_MAIN) );
             // sei();
@@ -148,8 +148,6 @@ int main4(void)
 
 int main(void)
 {
-    main3();
-
-    return(0);
+    return( main3() ); // Test using main 1, 2, 3, and 4. Consider exercises described in comments
 }
 		

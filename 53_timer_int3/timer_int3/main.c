@@ -1,4 +1,4 @@
-//* testing TIMER1 interrupt - main.c *
+//* optional more complex TIMER1 interrupt example - main.c *
 #include "bios_timer_int.h"
 #include "bios_led8.h"
 #include "bios_key4.h"
@@ -9,15 +9,15 @@
 //------------------------------------------------------------------------------------
 // Global constant(s)
 //------------------------------------------------------------------------------------
-#define MAX_MODES (6)
-#define MAX_SEQU  (5)
+#define MAX_MODES         6
+#define MAX_SEQU          5
 
-#define INT_FRQ     (1000)
+#define INT_FRQ        1000
 // the FRQ above is in Hz, the timing below is in 1/FRQ units
-#define KEY_DEBOUNCE (100)
-#define KEY_LONG    (1000)
+#define KEY_DEBOUNCE    100
+#define KEY_LONG       1000
 
-#define KEY_MODE    (3)
+#define KEY_MODE          3
 
 
 //------------------------------------------------------------------------------------
@@ -30,7 +30,7 @@ static uint8_t mode = 0;    // which pattern is used
 static uint8_t next = 1;    // which LED is to be used starting with the next cycle
 
 
-void interrupt_functionality_blinking(void) 
+void interrupt_functionality_blinking(void)
 {
     const int16_t blinkdata[MAX_MODES][MAX_SEQU] =
         {   {  500,  500,  -1,   0,  0 },
@@ -53,7 +53,7 @@ void interrupt_functionality_blinking(void)
             led8_set( led8_get() & ~current );  // LED off before switching
             current = next;
         }
-        
+
         phase++;                                // advance to the next timing for the given sequence
 
         if (blinkdata[mode][phase]<0) phase=0;
@@ -79,7 +79,7 @@ void interrupt_functionality_blinking(void)
     {
         counter--;
     }
-    
+
 }
 
 
@@ -89,7 +89,7 @@ void interrupt_functionality_button(void)
     // button related
     static unsigned int  time_K4_0_pressed  = 0; // How long the button has been pressed
     static unsigned int  time_K4_0_released = 0; // How long the button has been released
-    
+
     // handle timing of one button
     if ( key4_get()&(1<<KEY_MODE) )
     {                                           // the button is pressed
@@ -132,7 +132,7 @@ void interrupt_functionality_button(void)
 
 void MyTimerFN (void)
 {
-    // IMPORTANT: Make sure that time needed to do this entire function is (much) shorter 
+    // IMPORTANT: Make sure that time needed to do this entire function is (much) shorter
     // than time period between the interrupt is called.
     // If needed, use debugger on simulator to measure the time.
     interrupt_functionality_button();

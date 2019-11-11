@@ -7,11 +7,20 @@
 #include "bios_led8.h"
 #include "bios_key4.h"
 
+
+//------------------------------------------------------------------------------------
+// Global constant(s)
+//------------------------------------------------------------------------------------
 #define PWM_FREQUENCY       1000L
 #define INT_FREQUENCY       (PWM_FREQUENCY * PWM_RESOLUTION)
 #define MAIN_LOOP_FREQUENCY 100
 
+
+//------------------------------------------------------------------------------------
+// Global variable(s) used as bridge to pass parameters to the interrupts
+//------------------------------------------------------------------------------------
 static volatile uint8_t     semaphore = 0;  // volatile keyword is very important here!
+
 
 //------------------------------------------------------------------------------------
 // Timer1 Interrupt Functionality
