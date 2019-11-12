@@ -1,4 +1,4 @@
-//* testing TIMER1 interrupt - main.c *
+//* testing TIMER1 interrupt used to synchronize events in main loop - main.c *
 #include "bios_timer_int.h"
 #include "bios_led8.h"
 #include "bios_key4.h"
