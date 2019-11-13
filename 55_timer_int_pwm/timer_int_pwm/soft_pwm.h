@@ -9,6 +9,7 @@
 #define PWM_RESOLUTION  10
         // this is the number of levels, e.g. 5 means 0%, 20%, 40%, 60%, 80%, and 100%
         // it is actually 1./resolution as 100 will yield 1% resolution of PWM
+
 typedef uint8_t pwm_cnt_t;
         // this typedef works with PWM_RESOLUTION<=255 and PWM_100_PERCENT<=255
 

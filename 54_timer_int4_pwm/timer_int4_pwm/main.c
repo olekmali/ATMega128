@@ -11,8 +11,8 @@
 // Global constant(s)
 //------------------------------------------------------------------------------------
 #define PWM_FREQUENCY       1000L
-#define PWM_RESOLUTION      6
-                        //  ^^^ PWM resolution which is ( 100% / ( PWM_RESOLUTION-1) )
+#define PWM_RESOLUTION      5
+                        //  ^^^ PWM resolution which is ( 100% / PWM_RESOLUTION% )
                         //  ^^^ In this case it is 20%, the levels are 0% 20% 40% 60% 80% 100%
 #define INT_FREQUENCY       (PWM_FREQUENCY * PWM_RESOLUTION)
 #define MAIN_LOOP_FREQUENCY 100
@@ -46,7 +46,7 @@ void MyTimerFN (void)
     if (0<pwm_counter) {
         pwm_counter--;
     } else {
-        pwm_counter = PWM_RESOLUTION;
+        pwm_counter = (PWM_RESOLUTION-1);
         // we do not want PWM rate to change in the middle of a PWM cycle
         pwm_rate0 = pwm0;
         pwm_rate1 = pwm1;
@@ -113,19 +113,19 @@ int main(void)
             } else {
                 pwm0 = 0;
             }
-        } // else nothing. Technically several buttons may be depressed during the sdame time interval
+        } // else nothing. Technically several buttons may be depressed during the same time interval
 
         if ( (but_chg & B_K6) !=0 ) { // if ( (but_chg & 0b00000100) !=0 )
             if (pwm1<PWM_RESOLUTION) {
                 pwm1++;
             } // else nothing;
-        } // else nothing. Technically several buttons may be depressed during the sdame time interval
+        } // else nothing. Technically several buttons may be depressed during the same time interval
 
         if ( (but_chg & B_K7) !=0 ) { // if ( (but_chg & 0b00001000) !=0 )
             if (pwm1>0) {
                 pwm1--;
             } // else nothing;
-        } // else nothing. Technically several buttons may be depressed during the sdame time interval
+        } // else nothing. Technically several buttons may be depressed during the same time interval
 
     }
 
