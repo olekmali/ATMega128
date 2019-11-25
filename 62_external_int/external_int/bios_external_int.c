@@ -14,7 +14,7 @@ void External_Int0_initialize ( uint8_t mode, void (*handle_fn)(void) )
 {
     External_interrupt0_function = handle_fn;
     External_Int0_chg_mode(mode);
-    EIMSK = EIMSK | 1<<INT0;        
+    EIMSK = EIMSK | 1<<INT0;
     EIFR  = EIFR  | 1<<INTF0;
 }
 
@@ -93,10 +93,13 @@ void External_Int0_chg_mode (uint8_t mode)
     uint8_t sreg_save = SREG;           // preserve current interrupt status
     cli();
     uint8_t eicra_old = EICRA & ~(1<<ISC01|1<<ISC00);   // remove the old mode status
-    switch (mode) 
+    switch (mode)
     {
         case EXT_INT_MODE_pin_low:
             EICRA = eicra_old;
+        break;
+        case EXT_INT_MODE_pin_hi:
+            EICRA = eicra_old | 1<<ISC00;
         break;
         case EXT_INT_MODE_pin_falle:
             EICRA = eicra_old | 1<<ISC01;
@@ -118,6 +121,9 @@ void External_Int1_chg_mode (uint8_t mode)
         case EXT_INT_MODE_pin_low:
             EICRA = eicra_old;
         break;
+        case EXT_INT_MODE_pin_hi:
+            EICRA = eicra_old | 1<<ISC10;
+        break;
         case EXT_INT_MODE_pin_falle:
             EICRA = eicra_old | 1<<ISC11;
         break;
@@ -138,6 +144,9 @@ void External_Int4_chg_mode (uint8_t mode)
         case EXT_INT_MODE_pin_low:
             EICRB = eicrb_old;
         break;
+        case EXT_INT_MODE_pin_hi:
+            EICRB = eicrb_old | 1<<ISC40;
+        break;
         case EXT_INT_MODE_pin_falle:
             EICRB = eicrb_old | 1<<ISC41;
         break;
@@ -156,13 +165,16 @@ void External_Int5_chg_mode (uint8_t mode)
     switch (mode)
     {
         case EXT_INT_MODE_pin_low:
-        EICRB = eicrb_old;
+            EICRB = eicrb_old;
+        break;
+        case EXT_INT_MODE_pin_hi:
+            EICRB = eicrb_old | 1<<ISC50;
         break;
         case EXT_INT_MODE_pin_falle:
-        EICRB = eicrb_old | 1<<ISC51;
+            EICRB = eicrb_old | 1<<ISC51;
         break;
         case EXT_INT_MODE_pin_raise:
-        EICRB = eicrb_old | 1<<ISC51 | 1<<ISC50;
+            EICRB = eicrb_old | 1<<ISC51 | 1<<ISC50;
         break;
     } // switch
     SREG = sreg_save;                   // restore interrupts
@@ -176,13 +188,16 @@ void External_Int6_chg_mode (uint8_t mode)
     switch (mode)
     {
         case EXT_INT_MODE_pin_low:
-        EICRB = eicrb_old;
+            EICRB = eicrb_old;
+        break;
+        case EXT_INT_MODE_pin_hi:
+            EICRB = eicrb_old | 1<<ISC60;
         break;
         case EXT_INT_MODE_pin_falle:
-        EICRB = eicrb_old | 1<<ISC61;
+            EICRB = eicrb_old | 1<<ISC61;
         break;
         case EXT_INT_MODE_pin_raise:
-        EICRB = eicrb_old | 1<<ISC61 | 1<<ISC60;
+            EICRB = eicrb_old | 1<<ISC61 | 1<<ISC60;
         break;
     } // switch
     SREG = sreg_save;                   // restore interrupts
@@ -196,13 +211,16 @@ void External_Int7_chg_mode (uint8_t mode)
     switch (mode)
     {
         case EXT_INT_MODE_pin_low:
-        EICRB = eicrb_old;
+            EICRB = eicrb_old;
+        break;
+        case EXT_INT_MODE_pin_hi:
+            EICRB = eicrb_old | 1<<ISC70;
         break;
         case EXT_INT_MODE_pin_falle:
-        EICRB = eicrb_old | 1<<ISC71;
+            EICRB = eicrb_old | 1<<ISC71;
         break;
         case EXT_INT_MODE_pin_raise:
-        EICRB = eicrb_old | 1<<ISC71 | 1<<ISC70;
+            EICRB = eicrb_old | 1<<ISC71 | 1<<ISC70;
         break;
     } // switch
     SREG = sreg_save;                   // restore interrupts

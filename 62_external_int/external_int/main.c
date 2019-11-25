@@ -6,23 +6,24 @@
 #include <avr/interrupt.h>
 
 
-void MyFN4 (void)
+void MyFN45 (void)
 {
     // This demo function shows how to associate an action with a particular interrupt
-    led8_set(0); // reset LEDs
+    led8_set(0); // reset LEDs, this will also reset the count in main loop
 }
 
-void MyFN567 (void)
+void MyFN67 (void)
 {
     // This demo function shows how to associate action with several interrupts
     //      and check the source of the interrupt assuming pin_low activation.
-    // In general it might be easier to have four independent functions set. 
-    static uint8_t old_state = 0;
-    uint8_t state = key4_get();
-    uint8_t change = state ^ old_state;
-    state = old_state;
+    // In general it might be easier to have independent functions set for each pin.
 
-    led8_set( change ); // set LEDs based on input 
+    uint8_t inputs = key4_get();
+    uint8_t status = led8_get();
+    // uncomment only one of the two lines for the demo
+    status = status ^ (inputs<<4);      // this will show that buttons bounce and trigger multiple times
+    // status = status | (inputs<<4);   // this will show that the interrupt was triggered at least once
+    led8_set( status ); // set LEDs based on input
 }
 
 
@@ -33,17 +34,25 @@ int main(void)
     led8_set(0);
     key4_init();
 
-//  External_Int0_initialize(EXT_INT_MODE_pin_low, MyFN);
-//  External_Int1_initialize(EXT_INT_MODE_pin_low, MyFN);
-    External_Int4_initialize(EXT_INT_MODE_pin_low, MyFN4);
-    External_Int5_initialize(EXT_INT_MODE_pin_low, MyFN567);
-    External_Int6_initialize(EXT_INT_MODE_pin_low, MyFN567);
-    External_Int7_initialize(EXT_INT_MODE_pin_low, MyFN567);
+    External_Int4_initialize(EXT_INT_MODE_pin_falle, MyFN45);   // test each of the modes - this triggered once
+    External_Int5_initialize(EXT_INT_MODE_pin_low,   MyFN45);   // test each of the modes - this triggered over and over again while button pressed
+
+    External_Int6_initialize(EXT_INT_MODE_pin_falle, MyFN67);
+    External_Int7_initialize(EXT_INT_MODE_pin_falle, MyFN67);
     sei(); // enable global interrupts, all circuitry must be initialized prior to this event
 
+    uint8_t keep_busy = 0;
     while(1)
     {
-        
+        keep_busy++;
+        if (keep_busy>=16)
+            keep_busy = 0;
+
+        cli();
+        led8_set( (led8_get() & 0xF0 ) | keep_busy );
+        sei();
+        delay(100);
+
     }
 
     return(0);
