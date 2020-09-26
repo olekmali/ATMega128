@@ -115,7 +115,7 @@ void PatternGenerator(void)
         {
             led8_set( led8_get() | 0x01 );
         } else {
-            led8_set( led8_get() & !0x01 );
+            led8_set( led8_get() & ~0x01 );
         }
     #endif
 
